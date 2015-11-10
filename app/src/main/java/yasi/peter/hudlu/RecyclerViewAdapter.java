@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import android.content.Context;
 import java.util.List;
+import android.view.*;
 
 /**
  * Created by peter.yasi on 11/9/15.
@@ -21,17 +22,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        // create a new view
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.my_layout, parent, false);
+
         return null;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-
+        holder.mTextView.setText(mStringList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mStringList.size();
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -39,7 +45,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public TextView mTextView;
         public MyViewHolder(TextView v) {
             super(v);
-            mTextView = v;
+            mTextView = (TextView) v.findViewById(R.id.my_text_view);
         }
     }
 
