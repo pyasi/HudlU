@@ -14,10 +14,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private String[] mStringList;
     private Context mContext;
+    private AdapterInterface mListener;
 
     public RecyclerViewAdapter(Context context, String[] stringArray) {
         this.mStringList = stringArray;
         this.mContext = context;
+        mListener = (AdapterInterface) context;
     }
 
     @Override
@@ -30,8 +32,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
         holder.mTextView.setText(mStringList[position]);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onItemClicked(v, position);
+            }
+        });
     }
 
     @Override
@@ -48,4 +57,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
+    public interface AdapterInterface {
+        void onItemClicked(View view, int position);
+    }
 }
