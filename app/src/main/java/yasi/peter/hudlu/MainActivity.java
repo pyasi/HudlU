@@ -9,15 +9,37 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+
+
 
 public class MainActivity extends AppCompatActivity {
+
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private final String[] myData = new String[]{"Adam Gucwa", "Alberto Chamorro",
+            "Chanse Strode", "Craig Zheng", "David Bohner", "Eric Clymer", "Jessica Hoffman",
+            "Jon Evans", "Jordan Degner", "Mitchel Pigsley", "Peter Yasi", "Seth Prauner", "Sue Yi",
+            "Zach Ramaekers", "Mike Isman", "Josh Cox"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, myData);
+        mRecyclerView.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
