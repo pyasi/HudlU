@@ -1,32 +1,42 @@
 package yasi.peter.hudlu;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.content.Context;
-import android.net.NetworkInfo;
+import android.view.View;
 import android.widget.Toast;
-import java.util.List;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.*;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.*;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import yasi.peter.hudlu.models.FavoriteUtil;
+import yasi.peter.hudlu.models.Favorites;
 import yasi.peter.hudlu.models.MashableNews;
 import yasi.peter.hudlu.models.MashableNewsItem;
-import java.util.ArrayList;
-import android.view.animation.*;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.AdapterInterface {
@@ -51,6 +61,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, myData);
         mRecyclerView.setAdapter(adapter);
+
+        SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        Boolean isFirstTime = preferences.getBoolean("isFirstTime", true);
+
+        if(isFirstTime) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Hello!");
+            builder.setMessage("Welcome to HudlU");
+            builder.create();
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            builder.show();
+        }
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isFirstTime", false);
+        editor.apply();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -79,8 +108,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Log.d("HudlU", "Settings menu item clicked.");
+        if (id == R.id.action_favorites) {
+            Log.d("HudlU", "Favorite menu item clicked.");
+
+            Intent intent = new Intent(this, FavoritesActivity.class);
+            startActivity(intent);
+
             return true;
         }
 
@@ -90,6 +123,26 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void onItemClicked(View view, int position) {
         Snackbar.make(view, myData.get(position).author, Snackbar.LENGTH_SHORT).show();
+
+        Uri webpage = Uri.parse(myData.get(position).link);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+
+    }
+
+    @Override
+    public void onFavoriteClicked(View view, MashableNewsItem item){
+        FavoriteUtil util = new FavoriteUtil();
+
+        if(!util.isFavorite(this, item)) {
+            util.addFavorite(this, item);
+        }
+        else{
+            util.removeFavorite(this, item);
+        }
+
     }
 
     public void fetchLatestNews(){

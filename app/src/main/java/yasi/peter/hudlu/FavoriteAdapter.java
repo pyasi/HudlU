@@ -1,5 +1,4 @@
 package yasi.peter.hudlu;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.Context;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -21,53 +19,45 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.List;
 
+import yasi.peter.hudlu.R;
 import yasi.peter.hudlu.models.FavoriteUtil;
 import yasi.peter.hudlu.models.Favorites;
 import yasi.peter.hudlu.models.MashableNewsItem;
 
+
 /**
  * Created by peter.yasi on 11/9/15.
  */
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
 
-    private List<MashableNewsItem> mDataSet;
+    private List<Favorites> mDataSet;
     private Context mContext;
     private AdapterInterface mListener;
     private RequestQueue mRequestQueue;
 
-    public RecyclerViewAdapter(Context context, List<MashableNewsItem> list) {
+    public FavoriteAdapter(Context context, List<Favorites> list) {
         this.mDataSet = list;
         this.mContext = context;
         mRequestQueue = Volley.newRequestQueue(context);
-        mListener = (AdapterInterface) context;
+        //mListener = (AdapterInterface) context;
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FavoriteAdapter.FavoriteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_layout2, parent, false);
-        MyViewHolder vh = new MyViewHolder(v);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_layout_favorites, parent, false);
+        FavoriteViewHolder vh = new FavoriteViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(final FavoriteViewHolder holder, final int position) {
 
-        final MashableNewsItem currentItem = mDataSet.get(position);
+        final Favorites currentItem = mDataSet.get(position);
 
-        holder.mTitleTextView.setText(currentItem.title);
-        holder.mAuthorTextView.setText(currentItem.author);
-
-        FavoriteUtil util = new FavoriteUtil();
-
-        if(util.isFavorite(mContext, currentItem)){
-            holder.mFavoriteButton.setBackgroundResource(R.color.accent);
-            holder.mFavoriteButton.setTextColor(Color.WHITE);
-        }else{
-            holder.mFavoriteButton.setBackgroundColor(Color.WHITE);
-            holder.mFavoriteButton.setTextColor(Color.BLACK);
-        }
+        holder.mTitleTextView.setText(currentItem.getTitle());
+        holder.mAuthorTextView.setText(currentItem.getAuthor());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,14 +66,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         });
 
-        holder.mFavoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onFavoriteClicked(v, currentItem);
-            }
-        });
-
-        ImageRequest request = new ImageRequest(currentItem.image,
+        ImageRequest request = new ImageRequest(currentItem.getImage(),
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
@@ -104,25 +87,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mDataSet.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public TextView mTitleTextView;
         public TextView mAuthorTextView;
         public ImageView mImageView;
-        public Button mFavoriteButton;
 
-        public MyViewHolder(View v) {
+        public FavoriteViewHolder(View v) {
             super(v);
             mTitleTextView = (TextView) v.findViewById(R.id.item_title);
             mAuthorTextView = (TextView) v.findViewById(R.id.item_author);
             mImageView = (ImageView) v.findViewById(R.id.item_image);
-            mFavoriteButton = (Button) v.findViewById(R.id.favorite_button);
         }
     }
 
     public interface AdapterInterface {
         void onItemClicked(View view, int position);
-
-        void onFavoriteClicked(View view, MashableNewsItem item);
     }
 }

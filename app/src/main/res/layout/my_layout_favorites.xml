@@ -34,12 +34,6 @@
             android:text="TEST"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Favorite"
-            android:id="@+id/favorite_button" />
-
     </LinearLayout>
 
 
